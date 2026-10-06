@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Oracle AI World — Fusion Hackathon A2A Participant Guide</title>
+  <meta name="description" content="Step-by-step guide for connecting Oracle AI Studio to the Google Cloud Run A2A Server (a2a_server_agent) for the Oracle AI World Fusion Hackathon." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #0b0d11;
+      --bg-surface: #12151c;
+      --bg-elevated: #181c25;
+      --border-subtle: #252b39;
+      --border-strong: #333b4d;
+      --text-primary: #f3f5f8;
+      --text-secondary: #9ba3b4;
+      --text-muted: #687082;
+      --accent-blue: #3b82f6;
+      --accent-blue-soft: rgba(59, 130, 246, 0.14);
+      --accent-green: #10b981;
+      --accent-green-soft: rgba(16, 185, 129, 0.14);
+      --accent-amber: #f59e0b;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.65;
+      padding-bottom: 4rem;
+    }
+
+    code, pre, .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .container {
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 2rem 1.75rem;
+    }
+
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding-bottom: 1.25rem;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .btn {
+      padding: 0.5rem 0.95rem;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.85rem;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      text-decoration: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .btn-primary {
+      background: var(--accent-blue);
+      border-color: var(--accent-blue);
+      color: #ffffff;
+    }
+
+    h1 {
+      font-size: 1.85rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin: 2.25rem 0 0.9rem;
+      padding-bottom: 0.45rem;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+    }
+
+    h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin: 1.4rem 0 0.55rem;
+      color: var(--text-primary);
+    }
+
+    p, li {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    ul, ol {
+      padding-left: 1.4rem;
+      margin-bottom: 1rem;
+    }
+
+    li {
+      margin-bottom: 0.45rem;
+    }
+
+    strong {
+      color: var(--text-primary);
+    }
+
+    a {
+      color: var(--accent-blue);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1.25rem 1.4rem;
+      margin: 1rem 0;
+      box-shadow: var(--shadow-card);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      font-size: 0.88rem;
+    }
+
+    th {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-bottom: 1px solid var(--border-strong);
+    }
+
+    td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      vertical-align: top;
+    }
+
+    pre {
+      background: #07090d;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 1rem;
+      overflow-x: auto;
+      font-size: 0.82rem;
+      color: #e2e8f0;
+      margin: 0.75rem 0 1.25rem;
+    }
+
+    code {
+      background: var(--bg-elevated);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.84em;
+      color: #e2e8f0;
+    }
+
+    pre code {
+      background: transparent;
+      padding: 0;
+    }
+
+    .callout {
+      background: var(--accent-blue-soft);
+      border-left: 3px solid var(--accent-blue);
+      padding: 0.9rem 1.15rem;
+      border-radius: var(--radius-sm);
+      margin: 1rem 0;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+    }
+
+    .prompt-box {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.6rem;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav class="top-nav">
+      <div>
+        <span class="mono" style="font-size: 0.78rem; color: var(--accent-green); font-weight: 600;">
+          ● LIVE GOOGLE CLOUD RUN A2A SERVER
+        </span>
+      </div>
+      <div style="display: flex; gap: 0.6rem;">
+        <a href="/" class="btn btn-primary" id="link-open-console">
+          ⚡ Open Interactive A2A Command Center
+        </a>
+        <a href="/.well-known/agent-card.json" target="_blank" class="btn" id="link-open-card">
+          🪪 View Live Agent Card JSON
+        </a>
+      </div>
+    </nav>
+
+    <h1>Oracle AI World — Fusion Hackathon A2A Participant Guide</h1>
+    <p>
+      Step-by-step instructions for connecting <strong>Oracle AI Studio</strong> (and custom A2A clients) to the live
+      <strong>Google Cloud Run A2A Server (<code>a2a_server_agent</code>)</strong> over the open <strong>Agent2Agent (A2A)</strong> protocol.
+    </p>
+
+    <h2>1. Quick-Reference Connection Sheet</h2>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 32%;">Configuration Field</th>
+          <th>Live Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Agent Name / ID</strong></td>
+          <td><code>a2a_server_agent</code></td>
+        </tr>
+        <tr>
+          <td><strong>A2A JSON-RPC Endpoint (<code>POST</code>)</strong></td>
+          <td><code>https://service-request-a2a-agent-kavsor5jha-uc.a.run.app</code></td>
+        </tr>
+        <tr>
+          <td><strong>A2A Agent Card Discovery URL (<code>GET</code>)</strong></td>
+          <td><code>https://service-request-a2a-agent-kavsor5jha-uc.a.run.app/.well-known/agent-card.json</code></td>
+        </tr>
+        <tr>
+          <td><strong>Legacy Agent Card Alias (<code>GET</code>)</strong></td>
+          <td><code>https://service-request-a2a-agent-kavsor5jha-uc.a.run.app/.well-known/agent.json</code></td>
+        </tr>
+        <tr>
+          <td><strong>Live Command Center &amp; Audit UI (<code>GET</code>)</strong></td>
+          <td><a href="https://service-request-a2a-agent-kavsor5jha-uc.a.run.app">https://service-request-a2a-agent-kavsor5jha-uc.a.run.app</a></td>
+        </tr>
+        <tr>
+          <td><strong>Protocol Transport &amp; Versions</strong></td>
+          <td><code>JSONRPC</code> (Supports both A2A <code>0.3</code> <code>message/send</code> and A2A <code>1.0</code> <code>SendMessage</code>)</td>
+        </tr>
+        <tr>
+          <td><strong>Inbound Authentication</strong></td>
+          <td>
+            <strong>Public / Unauthenticated</strong> enabled by default for frictionless hackathon onboarding.<br/>
+            <em>(Optional authenticated mode: <code>X-API-KEY: oracle-ai-world-2026</code> or <code>Authorization: Bearer oracle-ai-world-2026</code>)</em>
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Optional Team Attribution Headers</strong></td>
+          <td>
+            <code>X-Caller-Id: &lt;your-team-name&gt;</code><br/>
+            <code>X-Caller-Role: Oracle AI Studio Hackathon</code>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>2. Architecture &amp; Available Tools</h2>
+    <div class="card">
+      <p>
+        This A2A Server runs on <strong>Google Cloud Run</strong> in Google Cloud Partner Engineering tenancy, powered by
+        <strong>Google Agent Development Kit (ADK 2.0)</strong> and <strong>Vertex AI (<code>gemini-3.5-flash</code>)</strong>.
+        Inside the A2A Server is a ServiceNow-style IT &amp; Supply Chain Service Request Agent (<code>a2a_server_agent</code>)
+        that reads and persists trouble tickets to <strong>Google Cloud Storage (GCS)</strong>
+        (<code>gs://iamtests-315719-oracle-hackathon-tickets/tickets/*.json</code>).
+      </p>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Tool Name</th>
+          <th>Description</th>
+          <th>Parameters</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>create_trouble_ticket</code></td>
+          <td>Creates a new IT or Supply Chain trouble ticket and stores <code>tickets/&lt;ticket_id&gt;.json</code> in GCS. Automatically routes <code>HIGH</code>/<code>CRITICAL</code> tickets to <code>L3 Database &amp; Cloud Ops</code>.</td>
+          <td><code>summary</code>, <code>severity</code> (<code>LOW</code>, <code>MEDIUM</code>, <code>HIGH</code>, <code>CRITICAL</code>), <code>category</code> (<code>DATABASE</code>, <code>SUPPLY_CHAIN</code>, <code>ERP_FUSION</code>, <code>IT_INFRASTRUCTURE</code>), <code>user_email</code>, <code>description</code></td>
+        </tr>
+        <tr>
+          <td><code>get_ticket_status</code></td>
+          <td>Retrieves real-time status, assignee, severity, and resolution notes for a ticket ID from GCS.</td>
+          <td><code>ticket_id</code> (e.g. <code>REQ-20261006123055-A68F</code>)</td>
+        </tr>
+        <tr>
+          <td><code>update_ticket_status</code></td>
+          <td>Updates an existing ticket's status and records resolution notes in GCS.</td>
+          <td><code>ticket_id</code>, <code>status</code> (<code>OPEN</code>, <code>IN_PROGRESS</code>, <code>PENDING_CUSTOMER</code>, <code>RESOLVED</code>, <code>CLOSED</code>), <code>resolution_notes</code></td>
+        </tr>
+        <tr>
+          <td><code>list_trouble_tickets</code></td>
+          <td>Lists recent trouble tickets stored in GCS, optionally filtered by status.</td>
+          <td><code>status_filter</code> (e.g. <code>OPEN</code>, <code>RESOLVED</code>), <code>limit</code> (default <code>10</code>)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>3. Step-by-Step Setup in Oracle AI Studio</h2>
+
+    <h3>Step 1: Verify the A2A Agent Card Discovery URL</h3>
+    <p>Verify that the discovery endpoint returns the agent's skills and JSON-RPC endpoint:</p>
+    <pre><code>curl -s https://service-request-a2a-agent-kavsor5jha-uc.a.run.app/.well-known/agent-card.json | jq .</code></pre>
+
+    <h3>Step 2: Register the Remote A2A Connection in Oracle AI Studio</h3>
+    <ol>
+      <li>Open <strong>Oracle AI Studio</strong> in your Oracle Fusion / AI World hackathon environment.</li>
+      <li>Navigate to <strong>Agents / Remote Agents (A2A Connections)</strong> and click <strong>Add Remote A2A Agent</strong>.</li>
+      <li>Enter the connection details:
+        <ul>
+          <li><strong>Name</strong>: <code>a2a_server_agent</code></li>
+          <li><strong>Agent Card / Discovery URL</strong>: <code>https://service-request-a2a-agent-kavsor5jha-uc.a.run.app/.well-known/agent-card.json</code></li>
+          <li><strong>A2A Endpoint URL</strong>: <code>https://service-request-a2a-agent-kavsor5jha-uc.a.run.app</code></li>
+          <li><strong>Authentication</strong>: Select <strong>None</strong> (or pass header <code>X-API-KEY: oracle-ai-world-2026</code>).</li>
+          <li><strong>Optional Custom Headers</strong>: Add <code>X-Caller-Id: team-&lt;your-team-name&gt;</code> so you can watch your team's calls live in the Command Center audit log!</li>
+        </ul>
+      </li>
+      <li>Save the connection and attach <code>a2a_server_agent</code> to your Oracle AI Studio workflow.</li>
+    </ol>
+
+    <h3>Step 3: Test with Sample Natural-Language Prompts</h3>
+    <div class="prompt-box">
+      <strong>1. Log a Critical Database Incident:</strong><br/>
+      "Create a CRITICAL severity trouble ticket in category DATABASE for 'ORA-12516 TNS listener connection pool exhausted on ADB-FINANCE-PROD' reported by team1@oracle.com."
+    </div>
+    <div class="prompt-box">
+      <strong>2. Log an Oracle Fusion Supply Chain Issue:</strong><br/>
+      "Create a HIGH severity service request in category SUPPLY_CHAIN for 'ASN shipment webhook timeout between Oracle Fusion SCM and Warehouse Management' for scm-ops@oracle.com."
+    </div>
+    <div class="prompt-box">
+      <strong>3. Check Ticket Status:</strong><br/>
+      "Check the current status and assigned support group for ticket REQ-20261006123055-A68F."
+    </div>
+    <div class="prompt-box">
+      <strong>4. Resolve a Ticket:</strong><br/>
+      "Update ticket REQ-20261006123055-A68F status to RESOLVED with resolution notes: 'Increased Autonomous DB connection pool from 50 to 200'."
+    </div>
+    <div class="prompt-box">
+      <strong>5. List Open Tickets in Google Cloud Storage:</strong><br/>
+      "List all OPEN trouble tickets currently stored in Google Cloud Storage."
+    </div>
+
+    <h2>4. Direct JSON-RPC 2.0 Testing (<code>curl</code> &amp; Python)</h2>
+    <h3>Option A: <code>curl</code> (A2A v0.3 <code>message/send</code>)</h3>
+    <pre><code>curl -s -X POST "https://service-request-a2a-agent-kavsor5jha-uc.a.run.app/" \
+  -H "Content-Type: application/json" \
+  -H "A2A-Version: 0.3" \
+  -H "X-Caller-Id: oracle-hackathon-team-1" \
+  -H "X-Caller-Role: Oracle AI Studio Participant" \
+  -H "X-API-KEY: oracle-ai-world-2026" \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": "req-001",
+    "method": "message/send",
+    "params": {
+      "message": {
+        "messageId": "msg-001",
+        "role": "user",
+        "parts": [
+          {
+            "kind": "text",
+            "text": "Create a HIGH severity ticket in category SUPPLY_CHAIN for Order Fulfillment sync delay reported by participant@oracle.com"
+          }
+        ]
+      }
+    }
+  }' | jq .</code></pre>
+
+    <h3>Option B: Python Client Using Google ADK <code>RemoteA2aAgent</code></h3>
+    <pre><code>from google.adk.agents import LlmAgent
+from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
+
+remote_a2a_server_agent = RemoteA2aAgent(
+    name="a2a_server_agent",
+    description="Handles IT and Supply Chain trouble tickets stored in Google Cloud Storage.",
+    agent_card="https://service-request-a2a-agent-kavsor5jha-uc.a.run.app/.well-known/agent-card.json",
+)
+
+orchestrator = LlmAgent(
+    name="oracle_fusion_orchestrator",
+    model="gemini-3.5-flash",
+    instruction="Delegate any IT or Supply Chain trouble ticket requests to a2a_server_agent.",
+    sub_agents=[remote_a2a_server_agent],
+)</code></pre>
+
+    <h2>5. Official Google Cloud ADK, A2A &amp; Oracle MCP References</h2>
+    <ul>
+      <li><strong>Google Agent Development Kit (ADK) Docs:</strong> <a href="https://google.github.io/adk-docs/" target="_blank">https://google.github.io/adk-docs/</a></li>
+      <li><strong>ADK Agent2Agent (A2A) Integration Guide:</strong> <a href="https://google.github.io/adk-docs/a2a/" target="_blank">https://google.github.io/adk-docs/a2a/</a></li>
+      <li><strong>ADK Python SDK Repository:</strong> <a href="https://github.com/google/adk-python" target="_blank">https://github.com/google/adk-python</a></li>
+      <li><strong>Agent2Agent (A2A) Protocol Specification:</strong> <a href="https://a2a-protocol.org/" target="_blank">https://a2a-protocol.org/</a></li>
+      <li><strong>A2A Protocol Inspector:</strong> <a href="https://github.com/a2aproject/a2a-inspector" target="_blank">https://github.com/a2aproject/a2a-inspector</a></li>
+      <li><strong>Google Cloud Managed MCP Server for Oracle Database@Google Cloud:</strong> <a href="https://cloud.google.com/oracle/database/docs/reference/mcp" target="_blank">https://cloud.google.com/oracle/database/docs/reference/mcp</a> (Endpoint: <code>https://oracledatabase.googleapis.com/mcp</code>)</li>
+    </ul>
+  </div>
+</body>
+</html>

@@ -35,10 +35,12 @@ A2A_ENFORCE_STRICT_AUTH = os.environ.get(
 ).lower() in ("true", "1", "yes")
 
 STATIC_INDEX_PATH = Path(__file__).parent / "static" / "index.html"
+STATIC_GUIDE_PATH = Path(__file__).parent / "static" / "guide.html"
 
 PUBLIC_PATHS = {
     "/health",
     "/console",
+    "/guide",
     "/api/audit",
     "/api/tickets",
     "/api/test-client/send",
@@ -102,11 +104,16 @@ class A2ASecurityAndAuditMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         path = request.url.path
 
-        # 1. Serve Interactive Command Center on GET / or GET /console
+        # 1. Serve Interactive Command Center on GET / or GET /console, and Guide on GET /guide
         if request.method == "GET" and path in {"/", "/console"}:
             if STATIC_INDEX_PATH.exists():
                 return HTMLResponse(
                     STATIC_INDEX_PATH.read_text(encoding="utf-8"), status_code=200
+                )
+        if request.method == "GET" and path == "/guide":
+            if STATIC_GUIDE_PATH.exists():
+                return HTMLResponse(
+                    STATIC_GUIDE_PATH.read_text(encoding="utf-8"), status_code=200
                 )
 
         # 2. Alias legacy /.well-known/agent.json to /.well-known/agent-card.json
