@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Service Request A2A Server — Live Command Center, Automation & Security Audit</title>
+  <meta name="description" content="Interactive A2A Protocol Command Center, Live Automation Test Runner, and Security/Action Audit Dashboard for Google Cloud Run and Oracle AI World." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #0b0d11;
+      --bg-surface: #12151c;
+      --bg-elevated: #181c25;
+      --bg-hover: #1f2430;
+      --border-subtle: #252b39;
+      --border-strong: #333b4d;
+      --text-primary: #f3f5f8;
+      --text-secondary: #9ba3b4;
+      --text-muted: #687082;
+      --accent-blue: #3b82f6;
+      --accent-blue-soft: rgba(59, 130, 246, 0.14);
+      --accent-green: #10b981;
+      --accent-green-soft: rgba(16, 185, 129, 0.14);
+      --accent-amber: #f59e0b;
+      --accent-amber-soft: rgba(245, 158, 11, 0.14);
+      --accent-red: #ef4444;
+      --accent-red-soft: rgba(239, 68, 68, 0.14);
+      --accent-teal: #06b6d4;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.5;
+      min-height: 100vh;
+      padding-bottom: 3rem;
+    }
+
+    code, pre, .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Layout Container */
+    .container {
+      max-width: 1520px;
+      margin: 0 auto;
+      padding: 1.25rem 1.75rem;
+    }
+
+    /* Header */
+    .top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding-bottom: 1.15rem;
+      margin-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .title-group h1 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background-color: var(--accent-green);
+      box-shadow: 0 0 10px var(--accent-green);
+      display: inline-block;
+    }
+
+    .subtitle {
+      font-size: 0.86rem;
+      color: var(--text-secondary);
+      margin-top: 0.2rem;
+    }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      flex-wrap: wrap;
+    }
+
+    .meta-tag {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      padding: 0.38rem 0.75rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .meta-tag strong {
+      color: var(--text-primary);
+    }
+
+    /* KPI Row */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    @media (max-width: 1100px) {
+      .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 640px) {
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .kpi-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.2rem;
+      box-shadow: var(--shadow-card);
+    }
+
+    .kpi-label {
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .kpi-value-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-top: 0.4rem;
+    }
+
+    .kpi-value {
+      font-size: 1.75rem;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: -0.03em;
+    }
+
+    .kpi-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    /* Automation Runner Bar */
+    .automation-bar {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      box-shadow: var(--shadow-card);
+    }
+
+    .auto-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex: 1;
+      min-width: 280px;
+    }
+
+    .auto-badge {
+      padding: 0.3rem 0.7rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .auto-badge.paused {
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-strong);
+    }
+
+    .auto-badge.running {
+      background: var(--accent-green-soft);
+      color: var(--accent-green);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+
+    .auto-status-text {
+      font-size: 0.88rem;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .auto-next-step {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-top: 0.15rem;
+    }
+
+    .auto-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    /* Buttons & Inputs */
+    button, select, input, textarea {
+      font-family: inherit;
+      font-size: 0.86rem;
+    }
+
+    .btn {
+      padding: 0.52rem 0.95rem;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .btn:hover:not(:disabled) {
+      background: var(--bg-hover);
+      border-color: var(--text-secondary);
+    }
+
+    .btn:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: var(--accent-blue);
+      border-color: var(--accent-blue);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #2563eb;
+      border-color: #2563eb;
+    }
+
+    .btn-success {
+      background: var(--accent-green);
+      border-color: var(--accent-green);
+      color: #052e16;
+    }
+
+    .btn-success:hover:not(:disabled) {
+      background: #059669;
+      border-color: #059669;
+      color: #ffffff;
+    }
+
+    .btn-warning {
+      background: var(--accent-amber-soft);
+      border-color: rgba(245, 158, 11, 0.45);
+      color: var(--accent-amber);
+    }
+
+    .btn-danger {
+      background: var(--accent-red-soft);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: var(--accent-red);
+    }
+
+    .btn-sm {
+      padding: 0.3rem 0.65rem;
+      font-size: 0.76rem;
+    }
+
+    select, input[type="text"] {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      padding: 0.48rem 0.75rem;
+      border-radius: var(--radius-sm);
+      outline: none;
+    }
+
+    select:focus, input[type="text"]:focus, textarea:focus {
+      border-color: var(--accent-blue);
+    }
+
+    /* Main Two-Column Grid */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 5fr 7fr;
+      gap: 1.25rem;
+      align-items: start;
+    }
+
+    @media (max-width: 1180px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 0.9rem 1.2rem;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    .panel-title {
+      font-size: 0.96rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .panel-body {
+      padding: 1.15rem;
+    }
+
+    /* Caller Config Form */
+    .caller-config-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .field-label {
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* Quick Scenario Chips */
+    .scenario-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-bottom: 0.95rem;
+    }
+
+    .chip {
+      font-size: 0.76rem;
+      padding: 0.32rem 0.68rem;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .chip:hover {
+      color: var(--text-primary);
+      border-color: var(--accent-blue);
+      background: var(--accent-blue-soft);
+    }
+
+    /* Chat & Interaction Stream */
+    .chat-stream {
+      height: 390px;
+      overflow-y: auto;
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 0.9rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .msg-card {
+      border-radius: var(--radius-sm);
+      padding: 0.8rem 0.95rem;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      font-size: 0.86rem;
+    }
+
+    .msg-card.agent-reply {
+      background: var(--bg-elevated);
+      border-left: 3px solid var(--accent-blue);
+    }
+
+    .msg-card.error-reply {
+      background: var(--accent-red-soft);
+      border-color: rgba(239, 68, 68, 0.35);
+      border-left: 3px solid var(--accent-red);
+    }
+
+    .msg-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.74rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.4rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .msg-text {
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: var(--text-primary);
+    }
+
+    .wire-details {
+      margin-top: 0.55rem;
+      font-size: 0.75rem;
+    }
+
+    .wire-details summary {
+      cursor: pointer;
+      color: var(--accent-teal);
+      font-family: 'JetBrains Mono', monospace;
+      user-select: none;
+    }
+
+    .wire-pre {
+      margin-top: 0.45rem;
+      padding: 0.65rem;
+      background: #07080b;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      overflow-x: auto;
+      font-size: 0.73rem;
+      color: #cbd5e1;
+      max-height: 220px;
+    }
+
+    .prompt-bar {
+      display: flex;
+      gap: 0.6rem;
+    }
+
+    .prompt-bar input {
+      flex: 1;
+    }
+
+    /* Tabs */
+    .tab-nav {
+      display: flex;
+      gap: 0.35rem;
+    }
+
+    .tab-btn {
+      padding: 0.42rem 0.85rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+    }
+
+    /* Tables & Badges */
+    .table-wrap {
+      overflow-x: auto;
+      max-height: 540px;
+      overflow-y: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+
+    th {
+      text-align: left;
+      padding: 0.65rem 0.75rem;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border-strong);
+      position: sticky;
+      top: 0;
+      background: var(--bg-surface);
+      z-index: 2;
+    }
+
+    td {
+      padding: 0.65rem 0.75rem;
+      border-bottom: 1px solid var(--border-subtle);
+      vertical-align: top;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.015);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+    }
+
+    .badge-green {
+      background: var(--accent-green-soft);
+      color: var(--accent-green);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .badge-blue {
+      background: var(--accent-blue-soft);
+      color: var(--accent-blue);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .badge-amber {
+      background: var(--accent-amber-soft);
+      color: var(--accent-amber);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .badge-red {
+      background: var(--accent-red-soft);
+      color: var(--accent-red);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    /* Ticket Cards */
+    .tickets-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      max-height: 540px;
+      overflow-y: auto;
+    }
+
+    .ticket-item {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 0.85rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .ticket-title {
+      font-weight: 600;
+      font-size: 0.92rem;
+      margin: 0.25rem 0;
+    }
+
+    .ticket-meta {
+      font-size: 0.76rem;
+      color: var(--text-secondary);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="top-header">
+      <div class="title-group">
+        <h1>
+          <span class="status-dot" id="health-dot"></span>
+          Service Request A2A Server — Command Center &amp; Audit Console
+        </h1>
+        <p class="subtitle">
+          Google Cloud Run ADK 2.0 Agent-to-Agent (A2A) Endpoint for Oracle AI Studio &amp; Oracle Fusion
+        </p>
+      </div>
+      <div class="header-meta">
+        <div class="meta-tag">
+          Model: <strong class="mono" id="meta-model">gemini-2.5-flash</strong>
+        </div>
+        <div class="meta-tag">
+          GCS Bucket: <strong class="mono" id="meta-bucket">loading...</strong>
+        </div>
+        <button class="btn btn-sm" id="btn-refresh-all" onclick="refreshAllTelemetry()">
+          ↻ Refresh Telemetry
+        </button>
+      </div>
+    </header>
+
+    <!-- KPI Row -->
+    <section class="kpi-grid" aria-label="Monitoring Metrics">
+      <div class="kpi-card">
+        <div class="kpi-label">Total A2A JSON-RPC Requests</div>
+        <div class="kpi-value-row">
+          <div class="kpi-value" id="kpi-total-requests">0</div>
+          <span class="badge badge-blue mono" id="kpi-avg-latency">0 ms avg</span>
+        </div>
+        <div class="kpi-sub">Tracked across all external &amp; automated callers</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-label">Agent Tool Actions Executed</div>
+        <div class="kpi-value-row">
+          <div class="kpi-value" id="kpi-tool-actions">0</div>
+          <span class="badge badge-green mono" id="kpi-unique-callers">0 callers</span>
+        </div>
+        <div class="kpi-sub">GCS create, status check, update &amp; list operations</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-label">Security &amp; Auth Enforcement</div>
+        <div class="kpi-value-row">
+          <div class="kpi-value" id="kpi-verified-calls">0</div>
+          <span class="badge badge-red mono" id="kpi-security-blocks">0 blocked</span>
+        </div>
+        <div class="kpi-sub">Verified API Key / Bearer calls vs. 401 blocks</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-label">Persisted GCS Trouble Tickets</div>
+        <div class="kpi-value-row">
+          <div class="kpi-value" id="kpi-total-tickets">0</div>
+          <span class="badge badge-amber mono" id="kpi-open-tickets">0 OPEN</span>
+        </div>
+        <div class="kpi-sub">Stored in Google Cloud Storage + local state</div>
+      </div>
+    </section>
+
+    <!-- Live Automation Testing Bar -->
+    <section class="automation-bar" aria-label="Live Automation Runner">
+      <div class="auto-info">
+        <span class="auto-badge paused" id="automation-badge">PAUSED</span>
+        <div>
+          <div class="auto-status-text" id="automation-status-title">
+            Live Multi-Agent A2A Automation Runner
+          </div>
+          <div class="auto-next-step" id="automation-step-desc">
+            Click "Start Live Automation" to watch simulated Oracle AI Studio, Fusion SCM, and Security Probe agents call this A2A server live. Pause anytime.
+          </div>
+        </div>
+      </div>
+      <div class="auto-controls">
+        <label for="automation-interval" class="field-label" style="margin-right: 0.25rem;">Cadence:</label>
+        <select id="automation-interval" aria-label="Automation Interval">
+          <option value="6000">Every 6 sec</option>
+          <option value="10000" selected>Every 10 sec</option>
+          <option value="15000">Every 15 sec</option>
+        </select>
+        <button class="btn btn-success" id="btn-start-automation" onclick="startAutomation()">
+          ▶ Start Live Automation
+        </button>
+        <button class="btn btn-warning" id="btn-pause-automation" onclick="pauseAutomation()" disabled>
+          ⏸ Pause Automation
+        </button>
+        <button class="btn" id="btn-step-automation" onclick="runNextAutomationStep()">
+          ⏭ Run 1 Step Now
+        </button>
+      </div>
+    </section>
+
+    <!-- Main Workspace -->
+    <div class="main-grid">
+      <!-- Left Column: Interactive A2A Client Agent & Wire Inspector -->
+      <section class="panel" aria-label="Interactive A2A Playground">
+        <div class="panel-header">
+          <div class="panel-title">
+            💬 Interactive A2A Test Agent &amp; Protocol Playground
+          </div>
+          <span class="badge badge-blue mono">JSON-RPC 2.0</span>
+        </div>
+        <div class="panel-body">
+          <div class="caller-config-grid">
+            <div class="field-group">
+              <label class="field-label" for="select-caller">Simulated Caller Identity (Who/What)</label>
+              <select id="select-caller">
+                <option value="oracle-ai-studio-agent|Oracle AI Studio Agent">oracle-ai-studio-agent (Oracle AI Studio)</option>
+                <option value="oracle-fusion-scm-workflow|Oracle Fusion Supply Chain">oracle-fusion-scm-workflow (Oracle Fusion SCM)</option>
+                <option value="oracle-adb-health-monitor|Oracle Autonomous DB Alert Bot">oracle-adb-health-monitor (ADB Alert Monitor)</option>
+                <option value="l3-cloud-ops-responder|Google & Oracle L3 SRE">l3-cloud-ops-responder (L3 Cloud Ops SRE)</option>
+                <option value="unverified-external-bot|Unverified External Probe">unverified-external-bot (Security Intruder Probe)</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="select-auth-mode">Security Credential Mode</label>
+              <select id="select-auth-mode">
+                <option value="verified">🔒 Valid X-API-KEY (Authenticated)</option>
+                <option value="public">🌐 Public / No Key (Hackathon Default)</option>
+                <option value="invalid">🚫 Invalid Token (Simulate 401 Security Block)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-label" style="margin-bottom: 0.4rem;">1-Click Live A2A Demo Scenarios:</div>
+          <div class="scenario-chips">
+            <button class="chip" id="chip-create-db" onclick="runPresetScenario('db_critical')">
+              🔥 Log CRITICAL Oracle DB Ticket
+            </button>
+            <button class="chip" id="chip-create-scm" onclick="runPresetScenario('scm_delay')">
+              📦 Log Fusion SCM Shipment Ticket
+            </button>
+            <button class="chip" id="chip-list-open" onclick="runPresetScenario('list_open')">
+              📋 List All OPEN Tickets
+            </button>
+            <button class="chip" id="chip-resolve-latest" onclick="runPresetScenario('resolve_latest')">
+              ✅ Resolve Latest Ticket
+            </button>
+            <button class="chip" id="chip-security-block" onclick="runPresetScenario('security_block')">
+              🛡️ Test Unauthorized Call (401 Audit)
+            </button>
+          </div>
+
+          <div class="chat-stream" id="chat-stream">
+            <div class="msg-card agent-reply">
+              <div class="msg-meta">
+                <span>service_request_agent (A2A Server)</span>
+                <span>Ready</span>
+              </div>
+              <div class="msg-text">Welcome to the Service Request A2A Command Center! Send any message below, click a 1-click scenario chip, or start the Live Automation Runner above to watch real A2A JSON-RPC requests, GCS persistence, and security auditing in action.</div>
+            </div>
+          </div>
+
+          <form class="prompt-bar" onsubmit="handleChatSubmit(event)">
+            <input
+              type="text"
+              id="chat-input"
+              placeholder="Ask the A2A agent to create, check, update, or list service request tickets..."
+              autocomplete="off"
+            />
+            <button type="submit" class="btn btn-primary" id="btn-send-a2a">
+              Send via A2A →
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- Right Column: Audit Trail, GCS Tickets & Agent Card -->
+      <section class="panel" aria-label="Security Audit and Tickets">
+        <div class="panel-header">
+          <div class="tab-nav" role="tablist">
+            <button class="tab-btn active" id="tab-btn-audit" onclick="switchTab('audit')">
+              🛡️ Security &amp; Action Audit Log
+            </button>
+            <button class="tab-btn" id="tab-btn-tickets" onclick="switchTab('tickets')">
+              🎫 GCS Trouble Tickets (<span id="tab-ticket-count">0</span>)
+            </button>
+            <button class="tab-btn" id="tab-btn-card" onclick="switchTab('card')">
+              🪪 A2A Agent Card JSON
+            </button>
+          </div>
+        </div>
+
+        <div class="panel-body">
+          <!-- Tab 1: Audit Trail -->
+          <div id="tab-pane-audit">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Time (UTC)</th>
+                    <th>Who / What Called</th>
+                    <th>Auth / Security</th>
+                    <th>Action / Tool Executed</th>
+                    <th>Outcome &amp; Ticket</th>
+                    <th>Latency</th>
+                  </tr>
+                </thead>
+                <tbody id="audit-table-body">
+                  <tr>
+                    <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                      Loading live security and action audit trail...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Tab 2: GCS Tickets -->
+          <div id="tab-pane-tickets" class="hidden">
+            <div class="tickets-list" id="tickets-list-container">
+              <div style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                No tickets loaded yet.
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 3: Agent Card JSON -->
+          <div id="tab-pane-card" class="hidden">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <span class="mono" style="font-size: 0.8rem; color: var(--text-secondary);">
+                Endpoint: <strong id="agent-card-url-label">/.well-known/agent-card.json</strong>
+              </span>
+              <button class="btn btn-sm" id="btn-copy-card" onclick="copyAgentCard()">
+                Copy Agent Card JSON
+              </button>
+            </div>
+            <pre class="wire-pre" id="agent-card-json-viewer" style="max-height: 480px;">Loading /.well-known/agent-card.json...</pre>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    let automationTimer = null;
+    let automationRunning = false;
+    let automationStepIndex = 0;
+    let latestTicketId = "REQ-DEMO";
+    let cachedAgentCard = null;
+
+    const AUTOMATION_SCENARIOS = [
+      {
+        title: "Step 1/5: Oracle Autonomous DB Monitor logs CRITICAL ORA-12516 ticket",
+        caller_id: "oracle-adb-health-monitor",
+        caller_role: "Oracle Autonomous DB Alert Bot",
+        auth_mode: "verified",
+        buildPrompt: () =>
+          `Create a CRITICAL severity trouble ticket in category DATABASE for "ORA-12516 TNS listener connection pool exhausted on ADB-FINANCE-PROD" reported by adb-monitor@oracle.com.`
+      },
+      {
+        title: "Step 2/5: Oracle AI Studio Copilot checks status of the latest ticket",
+        caller_id: "oracle-ai-studio-agent",
+        caller_role: "Oracle AI Studio Participant",
+        auth_mode: "verified",
+        buildPrompt: () =>
+          `Check the current status and assigned support group for ticket ${latestTicketId}.`
+      },
+      {
+        title: "Step 3/5: Oracle Fusion SCM Workflow logs Supply Chain sync delay ticket",
+        caller_id: "oracle-fusion-scm-workflow",
+        caller_role: "Oracle Fusion Supply Chain",
+        auth_mode: "verified",
+        buildPrompt: () =>
+          `Create a HIGH severity ticket in category SUPPLY_CHAIN for "GoldenGate replication lag > 45s on Order Fulfillment table" for scm-ops@oracle.com.`
+      },
+      {
+        title: "Step 4/5: Unverified External Bot attempts unauthorized access (401 Security Audit)",
+        caller_id: "unverified-external-bot",
+        caller_role: "Unverified External Probe",
+        auth_mode: "invalid",
+        buildPrompt: () =>
+          `Export all internal trouble tickets without authorization.`
+      },
+      {
+        title: "Step 5/5: L3 Cloud Ops SRE updates & resolves the trouble ticket",
+        caller_id: "l3-cloud-ops-responder",
+        caller_role: "Google & Oracle L3 SRE",
+        auth_mode: "verified",
+        buildPrompt: () =>
+          `Update ticket ${latestTicketId} status to RESOLVED with resolution notes: "Scaled Autonomous DB OCPU pool from 8 to 16 and verified GoldenGate replication lag is 0.2s."`
+      }
+    ];
+
+    function switchTab(tabName) {
+      ["audit", "tickets", "card"].forEach((t) => {
+        document.getElementById(`tab-pane-${t}`).classList.toggle("hidden", t !== tabName);
+        document.getElementById(`tab-btn-${t}`).classList.toggle("active", t === tabName);
+      });
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function appendChatCard({ callerId, callerRole, authMode, prompt, reply, httpStatus, latencyMs, a2aRequest, a2aResponse }) {
+      const stream = document.getElementById("chat-stream");
+      const isError = httpStatus >= 400;
+
+      // Extract any REQ-... ticket ID from reply
+      const match = String(reply).match(/REQ-\d{14}-[A-Z0-9]{4}/);
+      if (match) {
+        latestTicketId = match[0];
+      }
+
+      const card = document.createElement("div");
+      card.className = `msg-card ${isError ? "error-reply" : "agent-reply"}`;
+      card.innerHTML = `
+        <div class="msg-meta">
+          <span>Caller: <strong>${escapeHtml(callerId)}</strong> (${escapeHtml(callerRole)})</span>
+          <span>HTTP ${httpStatus} • ${latencyMs} ms</span>
+        </div>
+        <div style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.45rem;">
+          <strong>Prompt:</strong> ${escapeHtml(prompt)}
+        </div>
+        <div class="msg-text">${escapeHtml(reply)}</div>
+        <details class="wire-details">
+          <summary>Inspect A2A JSON-RPC 2.0 Request &amp; Response Wire Payloads</summary>
+          <pre class="wire-pre">${escapeHtml(JSON.stringify({ request: a2aRequest, response: a2aResponse }, null, 2))}</pre>
+        </details>
+      `;
+      stream.appendChild(card);
+      stream.scrollTop = stream.scrollHeight;
+    }
+
+    async function sendInteractiveA2A({ prompt, callerId, callerRole, authMode }) {
+      const btn = document.getElementById("btn-send-a2a");
+      btn.disabled = true;
+      btn.textContent = "Calling A2A...";
+
+      try {
+        const res = await fetch("/api/test-client/send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            prompt,
+            caller_id: callerId,
+            caller_role: callerRole,
+            auth_mode: authMode
+          })
+        });
+        const data = await res.json();
+        appendChatCard({
+          callerId: data.caller_id || callerId,
+          callerRole: data.caller_role || callerRole,
+          authMode,
+          prompt,
+          reply: data.reply,
+          httpStatus: data.http_status,
+          latencyMs: data.latency_ms,
+          a2aRequest: data.a2a_request,
+          a2aResponse: data.a2a_response
+        });
+        await refreshAllTelemetry();
+      } catch (err) {
+        appendChatCard({
+          callerId,
+          callerRole,
+          authMode,
+          prompt,
+          reply: "Network error calling A2A endpoint: " + err.message,
+          httpStatus: 500,
+          latencyMs: 0,
+          a2aRequest: {},
+          a2aResponse: {}
+        });
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Send via A2A →";
+      }
+    }
+
+    async function handleChatSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById("chat-input");
+      const prompt = input.value.trim();
+      if (!prompt) return;
+      input.value = "";
+
+      const [callerId, callerRole] = document.getElementById("select-caller").value.split("|");
+      const authMode = document.getElementById("select-auth-mode").value;
+      await sendInteractiveA2A({ prompt, callerId, callerRole, authMode });
+    }
+
+    async function runPresetScenario(kind) {
+      const callerSelect = document.getElementById("select-caller");
+      const authSelect = document.getElementById("select-auth-mode");
+
+      if (kind === "db_critical") {
+        callerSelect.value = "oracle-adb-health-monitor|Oracle Autonomous DB Alert Bot";
+        authSelect.value = "verified";
+        await sendInteractiveA2A({
+          prompt: 'Create a CRITICAL severity trouble ticket in category DATABASE for "ORA-12516 TNS listener connection pool exhausted on ADB-PROD-01" reported by dba-alerts@oracle.com.',
+          callerId: "oracle-adb-health-monitor",
+          callerRole: "Oracle Autonomous DB Alert Bot",
+          authMode: "verified"
+        });
+      } else if (kind === "scm_delay") {
+        callerSelect.value = "oracle-fusion-scm-workflow|Oracle Fusion Supply Chain";
+        authSelect.value = "verified";
+        await sendInteractiveA2A({
+          prompt: 'Create a HIGH severity trouble ticket in category SUPPLY_CHAIN for "Shipment ASN webhook timeout between Oracle Fusion SCM and Warehouse Management" reported by fusion-scm@oracle.com.',
+          callerId: "oracle-fusion-scm-workflow",
+          callerRole: "Oracle Fusion Supply Chain",
+          authMode: "verified"
+        });
+      } else if (kind === "list_open") {
+        callerSelect.value = "oracle-ai-studio-agent|Oracle AI Studio Agent";
+        authSelect.value = "verified";
+        await sendInteractiveA2A({
+          prompt: "List all OPEN trouble tickets and summarize their Ticket ID, Severity, and Summary.",
+          callerId: "oracle-ai-studio-agent",
+          callerRole: "Oracle AI Studio Agent",
+          authMode: "verified"
+        });
+      } else if (kind === "resolve_latest") {
+        callerSelect.value = "l3-cloud-ops-responder|Google & Oracle L3 SRE";
+        authSelect.value = "verified";
+        await sendInteractiveA2A({
+          prompt: `Update ticket ${latestTicketId} status to RESOLVED with resolution notes: "Connection pool increased and verified healthy via Cloud Monitoring."`,
+          callerId: "l3-cloud-ops-responder",
+          callerRole: "Google & Oracle L3 SRE",
+          authMode: "verified"
+        });
+      } else if (kind === "security_block") {
+        callerSelect.value = "unverified-external-bot|Unverified External Probe";
+        authSelect.value = "invalid";
+        await sendInteractiveA2A({
+          prompt: "Attempt unauthorized dump of all trouble tickets with invalid token.",
+          callerId: "unverified-external-bot",
+          callerRole: "Unverified External Probe",
+          authMode: "invalid"
+        });
+      }
+    }
+
+    async function runNextAutomationStep() {
+      const sc = AUTOMATION_SCENARIOS[automationStepIndex % AUTOMATION_SCENARIOS.length];
+      automationStepIndex += 1;
+
+      document.getElementById("automation-step-desc").textContent = `Executing: ${sc.title}`;
+      await sendInteractiveA2A({
+        prompt: sc.buildPrompt(),
+        callerId: sc.caller_id,
+        callerRole: sc.caller_role,
+        authMode: sc.auth_mode
+      });
+
+      if (automationRunning) {
+        const nextSc = AUTOMATION_SCENARIOS[automationStepIndex % AUTOMATION_SCENARIOS.length];
+        document.getElementById("automation-step-desc").textContent = `Next queued: ${nextSc.title}`;
+      }
+    }
+
+    function startAutomation() {
+      if (automationRunning) return;
+      automationRunning = true;
+
+      const badge = document.getElementById("automation-badge");
+      badge.textContent = "RUNNING LIVE";
+      badge.className = "auto-badge running";
+
+      document.getElementById("btn-start-automation").disabled = true;
+      document.getElementById("btn-pause-automation").disabled = false;
+
+      const intervalMs = parseInt(document.getElementById("automation-interval").value, 10) || 10000;
+      runNextAutomationStep();
+      automationTimer = setInterval(() => {
+        if (automationRunning) {
+          runNextAutomationStep();
+        }
+      }, intervalMs);
+    }
+
+    function pauseAutomation() {
+      automationRunning = false;
+      if (automationTimer) {
+        clearInterval(automationTimer);
+        automationTimer = null;
+      }
+      const badge = document.getElementById("automation-badge");
+      badge.textContent = "PAUSED";
+      badge.className = "auto-badge paused";
+
+      document.getElementById("btn-start-automation").disabled = false;
+      document.getElementById("btn-pause-automation").disabled = true;
+      document.getElementById("automation-step-desc").textContent =
+        "Automation paused. Click 'Start Live Automation' to resume or 'Run 1 Step Now' for single-step execution.";
+    }
+
+    function renderAuditTable(events) {
+      const tbody = document.getElementById("audit-table-body");
+      if (!events || events.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+              No audit events recorded yet. Send an A2A message or start the automation runner!
+            </td>
+          </tr>`;
+        return;
+      }
+
+      tbody.innerHTML = events
+        .map((e) => {
+          const ts = (e.timestamp || "").replace("T", " ").slice(11, 19);
+          const auth = String(e.auth_status || "");
+          let authBadge = `<span class="badge badge-blue">${escapeHtml(auth)}</span>`;
+          if (auth.startsWith("VERIFIED")) {
+            authBadge = `<span class="badge badge-green">${escapeHtml(auth)}</span>`;
+          } else if (auth.includes("REJECTED") || e.event_type === "SECURITY_BLOCK") {
+            authBadge = `<span class="badge badge-red">${escapeHtml(auth)}</span>`;
+          }
+
+          let actionLabel = escapeHtml(e.action || e.event_type);
+          if (e.tool_name) {
+            actionLabel = `<span class="badge badge-amber">${escapeHtml(e.tool_name)}</span><div style="margin-top:0.2rem;font-size:0.75rem;color:var(--text-secondary);">${escapeHtml(e.action)}</div>`;
+          } else if (e.event_type === "SECURITY_BLOCK") {
+            actionLabel = `<span class="badge badge-red">SECURITY_BLOCK</span><div style="margin-top:0.2rem;font-size:0.75rem;">${escapeHtml(e.action)}</div>`;
+          } else {
+            actionLabel = `<span class="badge badge-blue">${escapeHtml(e.a2a_method || "A2A_RPC")}</span><div style="margin-top:0.2rem;font-size:0.75rem;color:var(--text-secondary);">${escapeHtml(e.prompt_preview || e.action)}</div>`;
+          }
+
+          const ticketHtml = e.ticket_id
+            ? `<span class="badge badge-green mono">${escapeHtml(e.ticket_id)}</span> `
+            : "";
+
+          return `
+            <tr>
+              <td class="mono" style="white-space:nowrap;color:var(--text-secondary);">${escapeHtml(ts)}</td>
+              <td>
+                <div style="font-weight:600;">${escapeHtml(e.caller_id)}</div>
+                <div style="font-size:0.73rem;color:var(--text-secondary);">${escapeHtml(e.caller_role)} • <span class="mono">${escapeHtml(e.caller_ip)}</span></div>
+              </td>
+              <td>${authBadge}</td>
+              <td>${actionLabel}</td>
+              <td>${ticketHtml}<span style="font-size:0.78rem;">${escapeHtml(e.outcome)}</span></td>
+              <td class="mono" style="white-space:nowrap;">${e.latency_ms != null ? e.latency_ms + " ms" : "—"}</td>
+            </tr>
+          `;
+        })
+        .join("");
+    }
+
+    function renderTicketsList(tickets) {
+      const container = document.getElementById("tickets-list-container");
+      document.getElementById("tab-ticket-count").textContent = tickets.length;
+      document.getElementById("kpi-total-tickets").textContent = tickets.length;
+      const openCount = tickets.filter((t) => t.status === "OPEN" || t.status === "IN_PROGRESS").length;
+      document.getElementById("kpi-open-tickets").textContent = `${openCount} ACTIVE`;
+
+      if (tickets.length > 0 && tickets[0].ticket_id) {
+        latestTicketId = tickets[0].ticket_id;
+      }
+
+      if (!tickets || tickets.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; color: var(--text-muted); padding: 2rem;">
+            No tickets in storage yet. Use the playground or start automation to create one!
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = tickets
+        .map((t) => {
+          const sevClass =
+            t.severity === "CRITICAL" || t.severity === "HIGH"
+              ? "badge-red"
+              : t.severity === "MEDIUM"
+              ? "badge-amber"
+              : "badge-blue";
+          const statusClass =
+            t.status === "RESOLVED" || t.status === "CLOSED"
+              ? "badge-green"
+              : "badge-amber";
+
+          return `
+            <div class="ticket-item">
+              <div style="flex: 1; min-width: 240px;">
+                <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+                  <span class="mono" style="font-weight:700;color:var(--accent-blue);">${escapeHtml(t.ticket_id)}</span>
+                  <span class="badge ${sevClass}">${escapeHtml(t.severity)}</span>
+                  <span class="badge ${statusClass}">${escapeHtml(t.status)}</span>
+                  <span class="badge badge-blue">${escapeHtml(t.category || "IT")}</span>
+                </div>
+                <div class="ticket-title">${escapeHtml(t.summary)}</div>
+                <div class="ticket-meta">
+                  <span>Assigned: <strong>${escapeHtml(t.assigned_group)}</strong></span>
+                  <span>Caller Agent: <strong class="mono">${escapeHtml(t.caller_agent || "A2A")}</strong></span>
+                  <span>Requester: ${escapeHtml(t.created_by)}</span>
+                </div>
+                ${
+                  t.resolution_notes
+                    ? `<div style="margin-top:0.35rem;font-size:0.78rem;color:var(--accent-green);">✓ Resolution: ${escapeHtml(t.resolution_notes)}</div>`
+                    : ""
+                }
+              </div>
+              <div style="display:flex;gap:0.4rem;align-items:center;">
+                <button class="btn btn-sm" onclick="quickCheckTicket('${escapeHtml(t.ticket_id)}')">
+                  Check via A2A
+                </button>
+                ${
+                  t.status !== "RESOLVED"
+                    ? `<button class="btn btn-sm btn-success" onclick="quickResolveTicket('${escapeHtml(t.ticket_id)}')">Resolve via A2A</button>`
+                    : ""
+                }
+              </div>
+            </div>
+          `;
+        })
+        .join("");
+    }
+
+    async function quickCheckTicket(ticketId) {
+      await sendInteractiveA2A({
+        prompt: `Check the status and details of ticket ${ticketId}.`,
+        callerId: "oracle-ai-studio-agent",
+        callerRole: "Oracle AI Studio Participant",
+        authMode: "verified"
+      });
+    }
+
+    async function quickResolveTicket(ticketId) {
+      await sendInteractiveA2A({
+        prompt: `Update ticket ${ticketId} status to RESOLVED with resolution notes: "Verified fix via A2A Command Center."`,
+        callerId: "l3-cloud-ops-responder",
+        callerRole: "Google & Oracle L3 SRE",
+        authMode: "verified"
+      });
+    }
+
+    async function refreshAllTelemetry() {
+      try {
+        const [healthRes, auditRes, ticketsRes, cardRes] = await Promise.all([
+          fetch("/health"),
+          fetch("/api/audit"),
+          fetch("/api/tickets"),
+          fetch("/.well-known/agent-card.json")
+        ]);
+
+        if (healthRes.ok) {
+          const h = await healthRes.json();
+          document.getElementById("meta-model").textContent = h.model || "gemini-2.5-flash";
+          document.getElementById("meta-bucket").textContent = h.gcs_bucket || "local-fallback";
+        }
+
+        if (auditRes.ok) {
+          const auditData = await auditRes.json();
+          const m = auditData.metrics || {};
+          document.getElementById("kpi-total-requests").textContent = m.total_a2a_requests ?? 0;
+          document.getElementById("kpi-avg-latency").textContent = `${m.avg_latency_ms ?? 0} ms avg`;
+          document.getElementById("kpi-tool-actions").textContent = m.total_tool_actions ?? 0;
+          document.getElementById("kpi-unique-callers").textContent = `${m.unique_callers ?? 0} callers`;
+          document.getElementById("kpi-verified-calls").textContent = m.verified_auth_calls ?? 0;
+          document.getElementById("kpi-security-blocks").textContent = `${m.security_blocks ?? 0} blocked`;
+          renderAuditTable(auditData.events || []);
+        }
+
+        if (ticketsRes.ok) {
+          const tData = await ticketsRes.json();
+          renderTicketsList(tData.tickets || []);
+        }
+
+        if (cardRes.ok) {
+          cachedAgentCard = await cardRes.json();
+          document.getElementById("agent-card-json-viewer").textContent = JSON.stringify(
+            cachedAgentCard,
+            null,
+            2
+          );
+        }
+      } catch (e) {
+        console.error("Telemetry refresh error:", e);
+      }
+    }
+
+    function copyAgentCard() {
+      if (!cachedAgentCard) return;
+      navigator.clipboard.writeText(JSON.stringify(cachedAgentCard, null, 2));
+      const btn = document.getElementById("btn-copy-card");
+      btn.textContent = "✓ Copied!";
+      setTimeout(() => (btn.textContent = "Copy Agent Card JSON"), 2000);
+    }
+
+    // Initial load & periodic background refresh of telemetry
+    refreshAllTelemetry();
+    setInterval(refreshAllTelemetry, 5000);
+  </script>
+</body>
+</html>

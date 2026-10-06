@@ -1,6 +1,6 @@
 # Service Request A2A Agent (`service-request-a2a-agent`)
 
-An enterprise-ready **Agent-to-Agent (A2A)** server built with the **Google Agent Development Kit (ADK 2.0)** and **Google Cloud Storage (GCS)**, designed to run on **Google Cloud Run** and interoperate with **Oracle AI Studio** and **Oracle Fusion** workflows.
+An enterprise-ready **Agent-to-Agent (A2A)** server built with the **Google Agent Development Kit (ADK 2.0)** and **Google Cloud Storage (GCS)**, featuring **Real-Time Security & Action Auditing**, an **Interactive Web Command Center**, and a **Start/Pause Live Multi-Agent Automation Runner**.
 
 ---
 
@@ -8,103 +8,79 @@ An enterprise-ready **Agent-to-Agent (A2A)** server built with the **Google Agen
 
 ```mermaid
 flowchart LR
-    subgraph Oracle["Oracle Cloud / AI Studio"]
+    subgraph Callers["External & Automated Callers"]
         OAI["Oracle AI Studio / Oracle Fusion"]
+        AUTO["Live Automation Runner\n(Start / Pause / Step)"]
+        CLI["A2A Test Client\n(a2a_test_client.py)"]
     end
 
-    subgraph GCP["Google Cloud Platform (Partner Eng Account)"]
-        CR["Google Cloud Run\n(ADK 2.0 service_request_agent)"]
-        VA["Vertex AI\n(Gemini 2.5 Flash)"]
+    subgraph GCP["Google Cloud Platform (Cloud Run)"]
+        MW["A2ASecurityAndAuditMiddleware\n(Auth + Caller Attribution + Trace)"]
+        ADK["ADK 2.0 service_request_agent\n(Gemini 2.5 Flash)"]
+        UI["Interactive Command Center UI\n(GET / and /console)"]
+    end
+
+    subgraph Storage["Persistence & Observability"]
         GCS[("Google Cloud Storage\ngs://.../tickets/*.json")]
+        CL["Google Cloud Logging & Audit Trail\n(/api/audit & structured JSON logs)"]
     end
 
-    OAI <-->|"A2A Protocol (JSON-RPC over HTTPS)\n/.well-known/agent-card.json"| CR
-    CR <-->|"ADC / IAM"| VA
-    CR <-->|"google-cloud-storage SDK\n(+ Local Fallback)"| GCS
+    OAI & AUTO & CLI <-->|"A2A JSON-RPC 2.0 (POST /)\n+ /.well-known/agent-card.json"| MW
+    MW <--> ADK
+    ADK <-->|"Create / Get / Update / List"| GCS
+    MW & ADK -->|"Who Called & What Action Taken"| CL
+    UI <-->|"/api/test-client/send, /api/audit, /api/tickets"| MW
 ```
-
-### Key Improvements Over Initial Notebook Blueprint
-1. **ADK 2.0 & A2A Protocol Compatibility (`google-adk[a2a]>=2.0.0`)**:
-   - Upgraded from legacy `google-adk>=0.4.0` to `google-adk[a2a]>=2.0.0`.
-   - Serves both `/.well-known/agent-card.json` (A2A v0.3 / v1.0) and `/.well-known/agent.json` (legacy discovery) and strips redundant `:443` ports from advertised Cloud Run HTTPS URLs.
-2. **Vertex AI Environment Configuration on Cloud Run**:
-   - Explicitly configures `GOOGLE_GENAI_USE_VERTEXAI=true`, `GOOGLE_CLOUD_PROJECT`, and `GOOGLE_CLOUD_LOCATION` on Cloud Run and enables `aiplatform.googleapis.com` so the container authenticates seamlessly via Application Default Credentials (ADC).
-3. **Safe Cloud Run Environment Variable Updates**:
-   - Uses `gcloud run services update --update-env-vars="CLOUD_RUN_URL=..."` instead of `--set-env-vars` so setting the self-reported `CLOUD_RUN_URL` does not wipe out `GCS_BUCKET_NAME` and `GEMINI_MODEL`.
-   - Deploys directly from source (`gcloud run deploy --source .`) via Artifact Registry rather than deprecated `gcr.io`.
-4. **Expanded ServiceNow-Style Toolset & Stateful Local Fallback**:
-   - Collision-safe UTC ticket IDs (`REQ-YYYYMMDDHHMMSS-XXXX`) using `datetime.now(timezone.utc)`.
-   - Four tools: `create_trouble_ticket`, `get_ticket_status`, `update_ticket_status`, and `list_trouble_tickets`.
-   - Automatic local fallback (`/tmp/service_request_tickets`) when GCS is unconfigured or unreachable, ensuring full stateful behavior during local development and demos.
-5. **Optional Inbound Security (`X-API-KEY` / `Bearer` Token)**:
-   - Unauthenticated by default for rapid hackathon onboarding, or locked down with `X-API-KEY` / `Authorization: Bearer <token>` simply by setting the `A2A_API_KEY` environment variable (while keeping `/health` and `/.well-known/*` discovery endpoints public).
 
 ---
 
-## 2. Project Structure
+## 2. Key Capabilities
+
+1. **Full Caller & Action Auditing (`audit.py`)**:
+   - Tracks **who/what called** the A2A server (`caller_id`, `caller_role`, `caller_ip`, `user_agent`, `trace_id`, `auth_status`) and **what action it took** (`create_trouble_ticket`, `get_ticket_status`, `update_ticket_status`, `list_trouble_tickets`, affected `ticket_id`, and `latency_ms`).
+   - Emits structured JSON entries with `logging.googleapis.com/labels` directly to **Google Cloud Logging** and exposes real-time telemetry at `GET /api/audit`.
+2. **Inbound Security Enforcement (`main.py`)**:
+   - Supports `X-API-KEY` and `Authorization: Bearer <token>` validation.
+   - Automatically blocks and audits unauthorized / invalid token attempts (`SECURITY_BLOCK` with HTTP `401`) so security monitoring can be demonstrated live.
+3. **Interactive A2A Command Center (`static/index.html` served at `/` and `/console`)**:
+   - **Live Automation Runner**: Click **▶ Start Live Automation** to watch simulated multi-agent personas (`oracle-adb-health-monitor`, `oracle-ai-studio-agent`, `oracle-fusion-scm-workflow`, `unverified-external-bot`, `l3-cloud-ops-responder`) execute real A2A calls against the server, and click **⏸ Pause Automation** anytime to stop.
+   - **Interactive A2A Playground & Wire Inspector**: Send custom natural-language prompts or 1-click scenarios as any caller persona and inspect the raw A2A JSON-RPC 2.0 request/response payloads.
+   - **Live Audit Trail & GCS Trouble Tickets Board**: Watch audit logs and GCS tickets update in real time.
+4. **Standalone CLI & Programmatic Test Agent (`a2a_test_client.py`)**:
+   - Run `python a2a_test_client.py --url <CLOUD_RUN_URL>` from your terminal to execute an end-to-end A2A discovery, ticket creation, ticket listing, and security block verification suite.
+
+---
+
+## 3. Project Structure
 
 ```text
 service-request-a2a-agent/
-├── agent.py             # ADK 2.0 Root Agent & GCS/local trouble-ticket tools
-├── main.py              # A2A ASGI server entry point (to_a2a + auth/compat middleware)
+├── agent.py             # ADK 2.0 Root Agent & GCS/local trouble-ticket tools with audit hooks
+├── audit.py             # Security, caller attribution & action auditing engine (Cloud Logging + API)
+├── main.py              # A2A ASGI server entry point, security middleware & telemetry routes
+├── a2a_test_client.py   # Standalone A2A JSON-RPC test agent & CLI verification suite
+├── static/
+│   └── index.html       # Interactive A2A Command Center & Start/Pause Automation UI
 ├── agent_card.json      # Reference A2A Agent Card payload for Oracle registration
 ├── deploy.sh            # One-command Cloud Run & GCS deployment script
 ├── Dockerfile           # Python 3.12-slim container image for Cloud Run
-├── requirements.txt     # Pinned runtime dependencies
+├── requirements.txt     # Runtime dependencies
 ├── pyproject.toml       # Project metadata & pytest configuration
-├── .env.example         # Local environment variable template
 └── tests/
-    └── test_agent.py    # Unit tests for ticket tools & endpoint configuration
+    └── test_agent.py    # Unit tests for ticket tools, audit logging & A2A parsing
 ```
 
 ---
 
-## 3. Local Quick Start
+## 4. Deploy & Test on Google Cloud Run
 
 ```bash
-# 1. Create and activate virtual environment
-python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
-
-# 2. Configure environment variables
-cp .env.example .env
-# Edit .env with your GOOGLE_CLOUD_PROJECT (or GEMINI_API_KEY)
-
-# 3. Run the A2A server locally on http://localhost:8080
-.venv/bin/python main.py
-```
-
-Verify the local endpoints in another terminal:
-
-```bash
-# Health check
-curl -s http://localhost:8080/health | jq .
-
-# A2A Agent Card discovery
-curl -s http://localhost:8080/.well-known/agent-card.json | jq .
-```
-
----
-
-## 4. Deploy to Google Cloud Run
-
-Run the automated deployment script ([`deploy.sh`](file:///usr/local/google/home/anwarbelayachi/Dev/service-request-a2a-agent/deploy.sh)):
-
-```bash
-export PROJECT_ID="your-partner-eng-gcp-project"
-export REGION="us-central1"
-export BUCKET_NAME="${PROJECT_ID}-oracle-hackathon-tickets"
-
 chmod +x deploy.sh
 ./deploy.sh
 ```
 
-### Enable Optional API Key Security for Oracle Fusion
-
-If Oracle AI Studio / Oracle Fusion requires a shared secret header (`X-API-KEY` or `Authorization: Bearer <token>`):
+Run the standalone CLI test agent against your deployed Cloud Run URL:
 
 ```bash
-gcloud run services update service-request-a2a-agent \
-  --region="${REGION}" \
-  --update-env-vars="A2A_API_KEY=your-shared-hackathon-secret"
+python3 a2a_test_client.py --url "https://service-request-a2a-agent-750496483448.us-central1.run.app"
 ```
