@@ -14,12 +14,10 @@ Use these live endpoints to register and test the remote A2A agent in **Oracle A
 | **A2A JSON-RPC Endpoint (`POST`)** | `https://service-request-a2a-agent-kavsor5jha-uc.a.run.app` |
 | **A2A Agent Card Discovery URL (`GET`)** | `https://service-request-a2a-agent-kavsor5jha-uc.a.run.app/.well-known/agent-card.json` |
 | **Legacy Agent Card Alias (`GET`)** | `https://service-request-a2a-agent-kavsor5jha-uc.a.run.app/.well-known/agent.json` |
-| **Live Command Center & Audit UI (`GET`)** | `https://service-request-a2a-agent-kavsor5jha-uc.a.run.app` |
 | **Health & Readiness Probe (`GET`)** | `https://service-request-a2a-agent-kavsor5jha-uc.a.run.app/health` |
 | **Protocol Transport & Versions** | `JSONRPC` (Supports **both** A2A `0.3` `message/send` and A2A `1.0` `SendMessage`) |
 | **Inbound Authentication** | **Public / Unauthenticated** enabled by default for frictionless hackathon onboarding.<br>*(Optional authenticated mode: `X-API-KEY: oracle-ai-world-2026` or `Authorization: Bearer oracle-ai-world-2026`)* |
 | **Optional Team Attribution Headers** | `X-Caller-Id: <your-team-name>`<br>`X-Caller-Role: Oracle AI Studio Hackathon` |
-| **Source Code Repository** | [https://github.com/anwarbe/service-request-a2a-agent](https://github.com/anwarbe/service-request-a2a-agent) |
 
 ---
 
@@ -38,13 +36,11 @@ flowchart LR
         CR["Google Cloud Run\n(ADK 2.0 a2a_server_agent)"]
         VA["Vertex AI\n(Gemini 3.5 Flash)"]
         GCS[("Google Cloud Storage\ngs://iamtests-315719-oracle-hackathon-tickets")]
-        AUD["Live Command Center & Audit Trail\n(/, /api/audit, /api/tickets)"]
     end
 
     OAI <-->|"1. GET /.well-known/agent-card.json\n2. POST / (A2A JSON-RPC 2.0)"| CR
     CR <-->|"Vertex AI ADC"| VA
     CR <-->|"Read/Write Ticket JSONs\ntickets/REQ-*.json"| GCS
-    CR -->|"Tracks Caller & Tool Actions"| AUD
 ```
 
 ### Capabilities & Tools Exposed by `a2a_server_agent`
@@ -110,21 +106,6 @@ Once connected, send any of the following natural-language prompts through your 
    > *"Update ticket REQ-20261006123055-A68F status to RESOLVED with resolution notes: 'Increased Autonomous DB connection pool from 50 to 200'."*
 5. **List Open Tickets in Google Cloud Storage**:
    > *"List all OPEN trouble tickets currently stored in Google Cloud Storage."*
-
----
-
-### Step 4: Watch Your Calls Live in the Interactive Command Center
-
-Open **[https://service-request-a2a-agent-kavsor5jha-uc.a.run.app](https://service-request-a2a-agent-kavsor5jha-uc.a.run.app)** in your browser at any time during prep testing or the hackathon to access:
-
-1. **🛡️ Real-Time Security & Action Audit Log**:
-   - Displays **who/what called** the A2A server (`caller_id`, `caller_role`, IP address, and authentication status), **what A2A method and prompt** were received, **what tool action** the agent executed (`create_trouble_ticket`, `get_ticket_status`, `update_ticket_status`, `list_trouble_tickets`), the resulting **`REQ-...` Ticket ID**, and **response latency in milliseconds**.
-2. **🎫 Live GCS Trouble Tickets Board**:
-   - Inspect all tickets persisted in `gs://iamtests-315719-oracle-hackathon-tickets/tickets/*.json` in real time.
-3. **💬 Interactive A2A Playground & Wire Inspector**:
-   - Test prompts directly in the browser as different simulated personas and expand any message to inspect the raw **A2A JSON-RPC 2.0 Request & Response** payloads.
-4. **▶ Start / ⏸ Pause Live Multi-Agent Automation**:
-   - Organizers can click **▶ Start Live Automation** during demos to stream realistic multi-agent A2A traffic into the dashboard and click **⏸ Pause Automation** whenever finished.
 
 ---
 

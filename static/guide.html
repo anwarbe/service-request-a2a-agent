@@ -226,10 +226,7 @@
         </span>
       </div>
       <div style="display: flex; gap: 0.6rem;">
-        <a href="/" class="btn btn-primary" id="link-open-console">
-          ⚡ Open Interactive A2A Command Center
-        </a>
-        <a href="/.well-known/agent-card.json" target="_blank" class="btn" id="link-open-card">
+        <a href="/.well-known/agent-card.json" target="_blank" class="btn btn-primary" id="link-open-card">
           🪪 View Live Agent Card JSON
         </a>
       </div>
@@ -265,10 +262,6 @@
         <tr>
           <td><strong>Legacy Agent Card Alias (<code>GET</code>)</strong></td>
           <td><code>https://service-request-a2a-agent-kavsor5jha-uc.a.run.app/.well-known/agent.json</code></td>
-        </tr>
-        <tr>
-          <td><strong>Live Command Center &amp; Audit UI (<code>GET</code>)</strong></td>
-          <td><a href="https://service-request-a2a-agent-kavsor5jha-uc.a.run.app">https://service-request-a2a-agent-kavsor5jha-uc.a.run.app</a></td>
         </tr>
         <tr>
           <td><strong>Protocol Transport &amp; Versions</strong></td>
@@ -350,7 +343,7 @@
           <li><strong>Agent Card / Discovery URL</strong>: <code>https://service-request-a2a-agent-kavsor5jha-uc.a.run.app/.well-known/agent-card.json</code></li>
           <li><strong>A2A Endpoint URL</strong>: <code>https://service-request-a2a-agent-kavsor5jha-uc.a.run.app</code></li>
           <li><strong>Authentication</strong>: Select <strong>None</strong> (or pass header <code>X-API-KEY: oracle-ai-world-2026</code>).</li>
-          <li><strong>Optional Custom Headers</strong>: Add <code>X-Caller-Id: team-&lt;your-team-name&gt;</code> so you can watch your team's calls live in the Command Center audit log!</li>
+          <li><strong>Optional Custom Headers</strong>: Add <code>X-Caller-Id: team-&lt;your-team-name&gt;</code> to tag your team's A2A requests.</li>
         </ul>
       </li>
       <li>Save the connection and attach <code>a2a_server_agent</code> to your Oracle AI Studio workflow.</li>
