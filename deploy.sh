@@ -8,7 +8,7 @@ PROJECT_ID="${PROJECT_ID:-$(gcloud config get-value project 2>/dev/null || echo 
 REGION="${REGION:-us-central1}"
 SERVICE_NAME="${SERVICE_NAME:-service-request-a2a-agent}"
 BUCKET_NAME="${BUCKET_NAME:-${PROJECT_ID}-oracle-hackathon-tickets}"
-GEMINI_MODEL="${GEMINI_MODEL:-gemini-2.5-flash}"
+GEMINI_MODEL="${GEMINI_MODEL:-gemini-3.5-flash}"
 A2A_API_KEY="${A2A_API_KEY:-oracle-ai-world-2026}"
 
 if [[ -z "${PROJECT_ID}" ]]; then
@@ -16,7 +16,7 @@ if [[ -z "${PROJECT_ID}" ]]; then
   exit 1
 fi
 
-echo "==> Using GCP Project: ${PROJECT_ID} | Region: ${REGION}"
+echo "==> Using GCP Project: ${PROJECT_ID} | Region: ${REGION} | Model: ${GEMINI_MODEL}"
 gcloud config set project "${PROJECT_ID}"
 
 echo "==> 1. Enabling required Google Cloud APIs..."
@@ -44,7 +44,7 @@ gcloud run deploy "${SERVICE_NAME}" \
   --region="${REGION}" \
   --platform=managed \
   --allow-unauthenticated \
-  --set-env-vars="GOOGLE_GENAI_USE_VERTEXAI=true,GOOGLE_CLOUD_PROJECT=${PROJECT_ID},GOOGLE_CLOUD_LOCATION=${REGION},GCS_BUCKET_NAME=${BUCKET_NAME},GEMINI_MODEL=${GEMINI_MODEL},A2A_API_KEY=${A2A_API_KEY}"
+  --set-env-vars="GOOGLE_GENAI_USE_VERTEXAI=true,GOOGLE_CLOUD_PROJECT=${PROJECT_ID},GOOGLE_CLOUD_LOCATION=global,GCS_BUCKET_NAME=${BUCKET_NAME},GEMINI_MODEL=${GEMINI_MODEL},A2A_API_KEY=${A2A_API_KEY}"
 
 echo "==> 4. Updating CLOUD_RUN_URL so A2A Agent Card self-reports its live HTTPS URL..."
 SERVICE_URL="$(gcloud run services describe "${SERVICE_NAME}" --region="${REGION}" --format='value(status.url)')"

@@ -367,10 +367,13 @@ def list_trouble_tickets(status_filter: str = "", limit: int = 10) -> str:
     return json.dumps(records, indent=2)
 
 
+# Ensure global Vertex AI endpoint is used by default for Gemini 3.5 models
+os.environ.setdefault("GOOGLE_CLOUD_LOCATION", "global")
+
 # Define ADK 2.0 Root Agent
 root_agent = LlmAgent(
     name="service_request_agent",
-    model=os.environ.get("GEMINI_MODEL", "gemini-2.5-flash"),
+    model=os.environ.get("GEMINI_MODEL", "gemini-3.5-flash"),
     description=(
         "ServiceNow-style IT and Supply Chain Trouble Ticket & Service Request "
         "A2A Agent hosted on Google Cloud Run for Oracle AI Studio and Oracle Fusion."

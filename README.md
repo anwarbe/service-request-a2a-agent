@@ -20,7 +20,7 @@ flowchart LR
 
     subgraph GCP["Google Cloud Platform (Cloud Run)"]
         MW["A2ASecurityAndAuditMiddleware\n(Auth + Caller Attribution + Trace)"]
-        ADK["ADK 2.0 service_request_agent\n(Gemini 2.5 Flash)"]
+        ADK["ADK 2.0 service_request_agent\n(Gemini 3.5 Flash)"]
         UI["Interactive Command Center UI\n(GET / and /console)"]
     end
 

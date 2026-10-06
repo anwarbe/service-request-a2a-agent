@@ -26,7 +26,7 @@ Use these live endpoints to register and test the remote A2A agent in **Oracle A
 ## 2. Architecture & Scenario Overview
 
 ### Hackathon Scenario
-The **`service_request_agent`** is an enterprise IT and Supply Chain Trouble Ticket Agent (modeled after ServiceNow / ITSM workflows) hosted on **Google Cloud Run** in Google Cloud Partner Engineering tenancy. When invoked by an agent in **Oracle AI Studio**, it uses **Google Agent Development Kit (ADK 2.0)** and **Vertex AI (`gemini-2.5-flash`)** to create, query, update, and list trouble tickets persisted as structured JSON records in **Google Cloud Storage (GCS)**.
+The **`service_request_agent`** is an enterprise IT and Supply Chain Trouble Ticket Agent (modeled after ServiceNow / ITSM workflows) hosted on **Google Cloud Run** in Google Cloud Partner Engineering tenancy. When invoked by an agent in **Oracle AI Studio**, it uses **Google Agent Development Kit (ADK 2.0)** and **Vertex AI (`gemini-3.5-flash`)** to create, query, update, and list trouble tickets persisted as structured JSON records in **Google Cloud Storage (GCS)**.
 
 ```mermaid
 flowchart LR
@@ -36,7 +36,7 @@ flowchart LR
 
     subgraph GCP["Google Cloud Platform (Partner Engineering)"]
         CR["Google Cloud Run\n(ADK 2.0 service_request_agent)"]
-        VA["Vertex AI\n(Gemini 2.5 Flash)"]
+        VA["Vertex AI\n(Gemini 3.5 Flash)"]
         GCS[("Google Cloud Storage\ngs://iamtests-315719-oracle-hackathon-tickets")]
         AUD["Live Command Center & Audit Trail\n(/, /api/audit, /api/tickets)"]
     end
@@ -178,7 +178,7 @@ remote_service_request_agent = RemoteA2aAgent(
 # Attach it as a sub-agent to an orchestrator agent
 orchestrator = LlmAgent(
     name="oracle_fusion_orchestrator",
-    model="gemini-2.5-flash",
+    model="gemini-3.5-flash",
     instruction="Delegate any IT or Supply Chain trouble ticket requests to service_request_agent.",
     sub_agents=[remote_service_request_agent],
 )
