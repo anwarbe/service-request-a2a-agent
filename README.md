@@ -2,6 +2,10 @@
 
 An enterprise-ready **Agent-to-Agent (A2A)** server built with the **Google Agent Development Kit (ADK 2.0)** and **Google Cloud Storage (GCS)**, featuring **Real-Time Security & Action Auditing**, an **Interactive Web Command Center**, and a **Start/Pause Live Multi-Agent Automation Runner**.
 
+> [!IMPORTANT]
+> **Oracle AI World & Fusion Hackathon Participants / Organizers:**
+> See the complete step-by-step **[Oracle Hackathon Integration & Participant Guide (`ORACLE_HACKATHON_GUIDE.md`)](./ORACLE_HACKATHON_GUIDE.md)** for live connection URLs, Oracle AI Studio setup instructions, sample prompts, `curl`/Python snippets, and official ADK/A2A/MCP references.
+
 ---
 
 ## 1. Architecture Overview

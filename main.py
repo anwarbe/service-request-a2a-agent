@@ -114,7 +114,7 @@ class A2ASecurityAndAuditMiddleware(BaseHTTPMiddleware):
             request.scope["path"] = "/.well-known/agent-card.json"
             path = "/.well-known/agent-card.json"
 
-        # 3. Strip redundant ':443' port from advertised HTTPS URLs in Agent Card JSON
+        # 3. Strip redundant ':443' port and ensure dual A2A v0.3 + v1.0 card compatibility
         if path == "/.well-known/agent-card.json":
             response = await call_next(request)
             if response.status_code == 200:
@@ -122,7 +122,29 @@ class A2ASecurityAndAuditMiddleware(BaseHTTPMiddleware):
                 raw_body = b"".join(body_chunks).decode("utf-8")
                 cleaned_body = raw_body.replace(":443/", "/").replace(':443"', '"')
                 try:
-                    return JSONResponse(content=json.loads(cleaned_body), status_code=200)
+                    card_data = json.loads(cleaned_body)
+                    public_url = ""
+                    if isinstance(card_data.get("supportedInterfaces"), list) and card_data["supportedInterfaces"]:
+                        public_url = card_data["supportedInterfaces"][0].get("url", "").rstrip("/")
+                        has_v03 = any(
+                            i.get("protocolVersion") in ("0.3", "0.3.0")
+                            for i in card_data["supportedInterfaces"]
+                            if isinstance(i, dict)
+                        )
+                        if not has_v03 and public_url:
+                            card_data["supportedInterfaces"].append(
+                                {
+                                    "url": public_url,
+                                    "protocolBinding": "JSONRPC",
+                                    "protocolVersion": "0.3",
+                                }
+                            )
+                    if public_url:
+                        card_data.setdefault("url", public_url)
+                    card_data.setdefault("protocolVersion", "0.3.0")
+                    card_data.setdefault("preferredTransport", "JSONRPC")
+                    card_data["version"] = "1.0.0"
+                    return JSONResponse(content=card_data, status_code=200)
                 except Exception:
                     return Response(
                         content=cleaned_body,
