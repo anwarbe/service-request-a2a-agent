@@ -2,7 +2,7 @@
   "protocolVersion": "0.3.0",
   "name": "service_request_agent",
   "description": "ServiceNow-style IT and Supply Chain Trouble Ticket & Service Request A2A Agent hosted on Google Cloud Run for Oracle AI Studio and Oracle Fusion.",
-  "url": "https://service-request-a2a-agent-xyz-uc.a.run.app",
+  "url": "https://service-request-a2a-agent-kavsor5jha-uc.a.run.app",
   "preferredTransport": "JSONRPC",
   "version": "1.0.0",
   "defaultInputModes": [
