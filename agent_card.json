@@ -1,0 +1,39 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "service_request_agent",
+  "description": "ServiceNow-style IT and Supply Chain Trouble Ticket & Service Request A2A Agent hosted on Google Cloud Run for Oracle AI Studio and Oracle Fusion.",
+  "url": "https://service-request-a2a-agent-xyz-uc.a.run.app",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "capabilities": {
+    "streaming": true,
+    "pushNotifications": false
+  },
+  "skills": [
+    {
+      "id": "service_request_agent",
+      "name": "Service Request & Trouble Ticket Handler",
+      "description": "Logs IT and Supply Chain trouble tickets to Google Cloud Storage, retrieves real-time ticket status, updates ticket resolution status, and lists open tickets.",
+      "tags": [
+        "servicenow",
+        "trouble-ticket",
+        "supply-chain",
+        "gcs",
+        "oracle-fusion",
+        "oracle-ai-world"
+      ],
+      "examples": [
+        "Create a HIGH severity ticket for Oracle Autonomous Database connection timeout in production",
+        "Check the status of ticket REQ-20261006120000-A1B2",
+        "Update ticket REQ-20261006120000-A1B2 status to RESOLVED with note: Connection pool increased",
+        "List all OPEN trouble tickets"
+      ]
+    }
+  ]
+}

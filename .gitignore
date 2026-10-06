@@ -1,0 +1,25 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Environment variables & secrets
+.env
+.env.local
+*.pem
+*.key
+service-account*.json
+
+# Local fallback ticket storage
+.local_tickets/
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store

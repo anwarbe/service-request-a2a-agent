@@ -1,0 +1,24 @@
+[project]
+name = "service-request-a2a-agent"
+version = "1.0.0"
+description = "Google Cloud ADK 2.0 Service Request & Trouble Ticket A2A Agent for Oracle AI Studio / Oracle Fusion"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "google-adk[a2a]>=2.0.0",
+    "fastapi>=0.115.0",
+    "uvicorn>=0.30.0",
+    "google-cloud-storage>=2.18.0",
+    "httpx>=0.27.0",
+    "python-dotenv>=1.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.24.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = "."
+asyncio_default_fixture_loop_scope = "function"
