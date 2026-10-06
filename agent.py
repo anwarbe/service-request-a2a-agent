@@ -372,11 +372,12 @@ os.environ.setdefault("GOOGLE_CLOUD_LOCATION", "global")
 
 # Define ADK 2.0 Root Agent
 root_agent = LlmAgent(
-    name="service_request_agent",
+    name="a2a_server_agent",
     model=os.environ.get("GEMINI_MODEL", "gemini-3.5-flash"),
     description=(
-        "ServiceNow-style IT and Supply Chain Trouble Ticket & Service Request "
-        "A2A Agent hosted on Google Cloud Run for Oracle AI Studio and Oracle Fusion."
+        "Google Cloud A2A Server Agent (ServiceNow-style IT & Supply Chain "
+        "Service Request and Trouble Ticket Handler) hosted on Cloud Run for "
+        "Oracle AI Studio and Oracle Fusion."
     ),
     instruction="""You are an automated Enterprise IT and Supply Chain Service Request Agent.
 Your role is to assist Oracle AI Studio and Oracle Fusion users in:

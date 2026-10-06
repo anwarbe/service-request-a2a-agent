@@ -1,6 +1,6 @@
 {
   "protocolVersion": "0.3.0",
-  "name": "service_request_agent",
+  "name": "a2a_server_agent",
   "description": "ServiceNow-style IT and Supply Chain Trouble Ticket & Service Request A2A Agent hosted on Google Cloud Run for Oracle AI Studio and Oracle Fusion.",
   "url": "https://service-request-a2a-agent-kavsor5jha-uc.a.run.app",
   "preferredTransport": "JSONRPC",
@@ -17,7 +17,7 @@
   },
   "skills": [
     {
-      "id": "service_request_agent",
+      "id": "a2a_server_agent",
       "name": "Service Request & Trouble Ticket Handler",
       "description": "Logs IT and Supply Chain trouble tickets to Google Cloud Storage, retrieves real-time ticket status, updates ticket resolution status, and lists open tickets.",
       "tags": [

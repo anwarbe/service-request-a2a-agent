@@ -1,6 +1,6 @@
-# Oracle AI World — Fusion Hackathon Guide: Connecting Oracle AI Studio to Google Cloud A2A (`service_request_agent`)
+# Oracle AI World — Fusion Hackathon Guide: Connecting Oracle AI Studio to Google Cloud A2A (`a2a_server_agent`)
 
-Welcome to the **Oracle AI World Fusion Hackathon**! This guide provides everything the Oracle Hackathon organizing team and conference participants need to connect **Oracle AI Studio** (and custom A2A clients) to the live **Google Cloud Run `service_request_agent`** over the open **Agent2Agent (A2A)** protocol.
+Welcome to the **Oracle AI World Fusion Hackathon**! This guide provides everything the Oracle Hackathon organizing team and conference participants need to connect **Oracle AI Studio** (and custom A2A clients) to the live **Google Cloud Run `a2a_server_agent`** over the open **Agent2Agent (A2A)** protocol.
 
 ---
 
@@ -10,7 +10,7 @@ Use these live endpoints to register and test the remote A2A agent in **Oracle A
 
 | Configuration Field | Live Value |
 | :--- | :--- |
-| **Agent Name / ID** | `service_request_agent` |
+| **Agent Name / ID** | `a2a_server_agent` |
 | **A2A JSON-RPC Endpoint (`POST`)** | `https://service-request-a2a-agent-kavsor5jha-uc.a.run.app` |
 | **A2A Agent Card Discovery URL (`GET`)** | `https://service-request-a2a-agent-kavsor5jha-uc.a.run.app/.well-known/agent-card.json` |
 | **Legacy Agent Card Alias (`GET`)** | `https://service-request-a2a-agent-kavsor5jha-uc.a.run.app/.well-known/agent.json` |
@@ -26,7 +26,7 @@ Use these live endpoints to register and test the remote A2A agent in **Oracle A
 ## 2. Architecture & Scenario Overview
 
 ### Hackathon Scenario
-The **`service_request_agent`** is an enterprise IT and Supply Chain Trouble Ticket Agent (modeled after ServiceNow / ITSM workflows) hosted on **Google Cloud Run** in Google Cloud Partner Engineering tenancy. When invoked by an agent in **Oracle AI Studio**, it uses **Google Agent Development Kit (ADK 2.0)** and **Vertex AI (`gemini-3.5-flash`)** to create, query, update, and list trouble tickets persisted as structured JSON records in **Google Cloud Storage (GCS)**.
+The **`a2a_server_agent`** is an enterprise IT and Supply Chain Trouble Ticket Agent (modeled after ServiceNow / ITSM workflows) hosted on **Google Cloud Run** in Google Cloud Partner Engineering tenancy. When invoked by an agent in **Oracle AI Studio**, it uses **Google Agent Development Kit (ADK 2.0)** and **Vertex AI (`gemini-3.5-flash`)** to create, query, update, and list trouble tickets persisted as structured JSON records in **Google Cloud Storage (GCS)**.
 
 ```mermaid
 flowchart LR
@@ -35,7 +35,7 @@ flowchart LR
     end
 
     subgraph GCP["Google Cloud Platform (Partner Engineering)"]
-        CR["Google Cloud Run\n(ADK 2.0 service_request_agent)"]
+        CR["Google Cloud Run\n(ADK 2.0 a2a_server_agent)"]
         VA["Vertex AI\n(Gemini 3.5 Flash)"]
         GCS[("Google Cloud Storage\ngs://iamtests-315719-oracle-hackathon-tickets")]
         AUD["Live Command Center & Audit Trail\n(/, /api/audit, /api/tickets)"]
@@ -47,7 +47,7 @@ flowchart LR
     CR -->|"Tracks Caller & Tool Actions"| AUD
 ```
 
-### Capabilities & Tools Exposed by `service_request_agent`
+### Capabilities & Tools Exposed by `a2a_server_agent`
 
 | Tool Name | Description | Parameters |
 | :--- | :--- | :--- |
@@ -77,7 +77,7 @@ curl -s https://service-request-a2a-agent-kavsor5jha-uc.a.run.app/.well-known/ag
 1. Open **Oracle AI Studio** in your Oracle Fusion / AI World hackathon environment.
 2. Navigate to **Agents / Remote Agents (A2A Connections)** and click **Add Remote A2A Agent** (or **Register External Agent**).
 3. Enter the connection details:
-   - **Name**: `service_request_agent` (or `GCP Service Request Agent`)
+   - **Name**: `a2a_server_agent` (or `GCP Service Request Agent`)
    - **Agent Card / Discovery URL**:
      ```text
      https://service-request-a2a-agent-kavsor5jha-uc.a.run.app/.well-known/agent-card.json
@@ -92,7 +92,7 @@ curl -s https://service-request-a2a-agent-kavsor5jha-uc.a.run.app/.well-known/ag
    - **Optional Custom Headers** *(Recommended for Hackathon Teams)*:
      - `X-Caller-Id`: `team-<your-team-name>` (e.g., `team-alpha-fusion`)
      - `X-Caller-Role`: `Oracle AI Studio Hackathon`
-4. Save and test the connection. Your Oracle AI Studio orchestrator agent can now delegate service request and trouble ticket tasks to `service_request_agent`!
+4. Save and test the connection. Your Oracle AI Studio orchestrator agent can now delegate service request and trouble ticket tasks to `a2a_server_agent`!
 
 ---
 
@@ -169,8 +169,8 @@ from google.adk.agents import LlmAgent
 from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
 
 # Connect to the remote Cloud Run A2A Service Request Agent via its Agent Card URL
-remote_service_request_agent = RemoteA2aAgent(
-    name="service_request_agent",
+remote_a2a_server_agent = RemoteA2aAgent(
+    name="a2a_server_agent",
     description="Handles IT and Supply Chain trouble tickets stored in Google Cloud Storage.",
     agent_card="https://service-request-a2a-agent-kavsor5jha-uc.a.run.app/.well-known/agent-card.json",
 )
@@ -179,8 +179,8 @@ remote_service_request_agent = RemoteA2aAgent(
 orchestrator = LlmAgent(
     name="oracle_fusion_orchestrator",
     model="gemini-3.5-flash",
-    instruction="Delegate any IT or Supply Chain trouble ticket requests to service_request_agent.",
-    sub_agents=[remote_service_request_agent],
+    instruction="Delegate any IT or Supply Chain trouble ticket requests to a2a_server_agent.",
+    sub_agents=[remote_a2a_server_agent],
 )
 ```
 
